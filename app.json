@@ -4,7 +4,6 @@
     "slug": "password-game-proto",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "passwordgameproto",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,7 +18,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.yunuskarasen.passwordgameproto"
     },
     "web": {
       "output": "static",
@@ -43,6 +43,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "cbf67ca4-005d-4169-b8f4-02ddd51bef73"
+      }
     }
   }
 }

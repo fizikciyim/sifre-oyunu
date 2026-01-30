@@ -43,7 +43,6 @@ const level: Level = {
 
     numbersMustBeSorted,
 
-    sumOfNumbersEquals(25),
     productOfNumbersMax(9999),
 
     hasSpecialChar,

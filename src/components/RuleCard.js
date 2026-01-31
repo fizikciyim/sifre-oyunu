@@ -10,7 +10,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 export default function RuleCard({ item, index }) {
-  const isOk = item.ok === true;
+  const isConditional = item.rule?.isConditional === true;
+  const isOk = !isConditional && item.ok === true;
   const copyOpacity = useSharedValue(1);
   const copyTextStyle = useAnimatedStyle(() => ({
     opacity: copyOpacity.value,
@@ -64,7 +65,9 @@ export default function RuleCard({ item, index }) {
         ]}
       >
         <Text style={styles.statusIcon}>{isOk ? "✓" : "✕"}</Text>
-        <Text style={styles.cardTitle}>Kural {item.order}</Text>
+        <Text style={styles.cardTitle}>
+          {item.rule?.isConditional ? "Gizli Kural" : `Kural ${item.order}`}
+        </Text>
       </View>
 
       <View

@@ -45,26 +45,34 @@ export default function GameScreen({ navigation }) {
   useEffect(() => {
     if (!currentLevel) return;
 
-    const rulesForEvaluation = currentLevel.rules.map((rule, index) => ({
-      ...rule,
-      order: index + 1,
-    }));
-
+    const rulesForEvaluation = [
+      ...currentLevel.rules.map((rule, index) => ({
+        ...rule,
+        order: index + 1,
+        isConditional: false,
+      })),
+      ...(currentLevel.conditionalRules || []).map((rule, index) => ({
+        ...rule,
+        order: currentLevel.rules.length + index + 1,
+        isConditional: true,
+      })),
+    ];
     let evaluated = evaluateRules(rulesForEvaluation, password, {
       minute: lockedMinute,
       targetNumber,
     });
-
     setResults(evaluated);
   }, [password, currentLevel, paulIsDead]);
 
   useEffect(() => {
-    if (password.length === 0) return; // 🔒 KRİTİK
+    if (password.length === 0) return;
 
     let chainPassed = true;
     let highestUnlocked = 1;
 
     for (const r of results) {
+      if (r.isConditional) continue;
+
       if (r.order > highestUnlocked + 1) break;
 
       if (chainPassed && r.ok) {
@@ -89,6 +97,10 @@ export default function GameScreen({ navigation }) {
       .filter((r) => {
         const orderUnlocked = seenOrders.has(r.order);
 
+        if (r.rule?.isConditional && r.rule?.shouldShow) {
+          return r.rule.shouldShow(password);
+        }
+
         if (r.rule?.shouldShow) {
           return orderUnlocked && r.rule.shouldShow(password);
         }
@@ -96,7 +108,15 @@ export default function GameScreen({ navigation }) {
         return orderUnlocked;
       })
       .sort((a, b) => {
+        const aHidden = a.rule?.isConditional === true;
+        const bHidden = b.rule?.isConditional === true;
+
+        if (aHidden !== bHidden) {
+          return aHidden ? -1 : 1; // 👈 gizli olan en üste
+        }
+
         if (a.ok !== b.ok) return a.ok ? 1 : -1;
+
         return b.order - a.order;
       });
   }, [results, seenOrders, password]);

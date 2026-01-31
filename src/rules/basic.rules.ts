@@ -34,26 +34,22 @@ export const hasUppercase: Rule = {
   message: () => "En az 1 büyük harf",
   check: (password) => /[A-Z]/.test(password),
 };
+
 export const noUppercaseAtEdges: Rule = {
   id: "no_uppercase_at_edges",
-  message: () => "Şifrenin başında veya sonunda büyük harf olamaz",
+  message: () => "Şifrenin büyük ile bitemez.",
   check: (password) => {
     if (password.length === 0) return false;
 
-    const first = password[0];
     const last = password[password.length - 1];
 
-    if (/[A-Z]/.test(first)) return false;
     if (/[A-Z]/.test(last)) return false;
 
     return true;
   },
-};
-
-export const notEndWithNorE: Rule = {
-  id: "not_end_with_n_or_e",
-  message: () => "Parola n veya e harfiyle bitemez",
-  check: (password) => !/[ne]$/i.test(password),
+  shouldShow: (password) =>
+    password.length > 0 &&
+    (/[A-Z]/.test(password[0]) || /[A-Z]/.test(password[password.length - 1])),
 };
 
 /* =======================
@@ -67,26 +63,6 @@ export const hasNumber: Rule = {
   check: (password) => /[0-9]/.test(password),
 };
 
-/* En az N rakam */
-export const minNumbers = (count: number): Rule => ({
-  id: `min_numbers_${count}`,
-  message: () => `En az ${count} rakam`,
-  check: (password) => (password.match(/[0-9]/g) || []).length >= count,
-});
-
-/* 🔢 Rakamların toplamı X olmalı */
-export const sumOfNumbersEquals = (target: number): Rule => ({
-  id: `sum_of_numbers_${target}`,
-  message: () => `Rakamların toplamı ${target} olmalı`,
-  check: (password) => {
-    const sum = (password.match(/[0-9]/g) || [])
-      .map(Number)
-      .reduce((acc, n) => acc + n, 0);
-
-    return sum === target;
-  },
-});
-
 /* =======================
    ✳️ ÖZEL KARAKTERLER
 ======================= */
@@ -97,13 +73,6 @@ export const hasSpecialChar: Rule = {
   message: () => "En az 1 özel karakter",
   check: (password) => /[^a-zA-Z0-9]/.test(password),
 };
-
-/* Belirli özel karakterlerden biri */
-export const hasOneOfChars = (chars: string): Rule => ({
-  id: `has_one_of_${chars}`,
-  message: () => `Şu karakterlerden biri olmalı: ${chars}`,
-  check: (password) => chars.split("").some((c) => password.includes(c)),
-});
 
 /* =======================
    🚫 YASAKLAR
@@ -155,7 +124,6 @@ export const noFourCharPalindromeHidden: Rule = {
 export const mustContainCurrentHour: Rule = {
   id: "must_contain_current_hour",
   message: () => {
-    const hour = new Date().getHours().toString().padStart(2, "0");
     return `Şifre şu anki saati içermeli`;
   },
   check: (password) => {
@@ -164,14 +132,13 @@ export const mustContainCurrentHour: Rule = {
   },
 };
 export const stripIgnoredBlocks = (password: string) => {
-  // ^ ile ^ arasını tamamen kaldır
   return password.replace(/\^.*?\^/g, "");
 };
 
 export const numbersMustBeSorted: Rule = {
   id: "numbers_must_be_sorted",
   message: () =>
-    "Rakamlar küçükten büyüğe sıralı olmalı (^ ^ içindekiler sayılmaz)",
+    "Şifredeki rakamlar küçükten büyüğe sıralı olmalı (^ ^ içindekiler sayılmaz)",
   check: (password) => {
     const cleanPassword = stripIgnoredBlocks(password);
 
@@ -235,13 +202,19 @@ export const containsRomanNumeral: Rule = {
 export const containsAlkaliMetal: Rule = {
   id: "contains_alkali_metal",
   message: () =>
-    "Şifre periyodik tablodan bir alkali metal element sembolü içermeli",
+    "Şifre periyodik tablodan 2 harfli bir alkali metal element sembolü içermeli",
   check: (password) => {
-    const alkaliMetals = ["Li", "Na", "K", "Rb", "Cs", "Fr"];
+    const alkaliMetals = ["Li", "Na", "Rb", "Cs", "Fr"];
     return alkaliMetals.some((symbol) => password.includes(symbol));
   },
 };
+const INFINITY = "∞";
 
+export const containsInfinitySymbol: Rule = {
+  id: "contains_infinity_symbol",
+  message: () => "Şifre sonsuzluk sembolü içermeli",
+  check: (password) => password.includes(INFINITY),
+};
 export const containsPlanet: Rule = {
   id: "contains_planet",
   message: () => "Şifre Güneş sisteminden bir gezegen ismi içermeli",
@@ -251,45 +224,39 @@ export const containsPlanet: Rule = {
 export const planetStartsWithUppercase: Rule = {
   id: "planet_starts_with_uppercase",
   message: () => "Gezegen isimleri büyük harfle başlar",
+
   check: (password) =>
     /(Merkür|Venüs|Dünya|Mars|Jüpiter|Satürn|Uranüs|Neptün)/.test(password),
+
+  shouldShow: (password) =>
+    /(merkür|venüs|dünya|mars|jüpiter|satürn|uranüs|neptün)/.test(password),
 };
 
-export const containsWaterBoilingPoint: Rule = {
-  id: "contains_water_boiling_point",
-  message: () => "Suyun kaynama sıcaklığını içermeli (°C)",
-  check: (password) => /100/.test(password),
+export const containsAbsoluteZero: Rule = {
+  id: "contains_absolute_zero",
+  message: () => "Mutlak sıfır sıcaklığını ondalıklı biçimde içermeli (°C)",
+  check: (password) => /-273\.15/.test(password),
 };
-
 export const containsEiffelCity: Rule = {
   id: "contains_eiffel_city",
-  message: () => "Eyfel Kulesi'nin bulunduğu şehri içermeli",
+  message: () => "Şifre Eyfel Kulesi'nin bulunduğu şehri içermeli",
   check: (password) => /paris/i.test(password),
 };
-export const containsFirstElement: Rule = {
-  id: "contains_first_element",
-  message: () => "Periyodik tablonun ilk elementin ismini içermeli",
-  check: (password) => /hidrojen/i.test(password),
+
+export const maxOneDot: Rule = {
+  id: "max_one_dot",
+  message: () => "Şifre içinde en fazla 1 tane nokta (.) olabilir",
+
+  check: (password) => {
+    const count = (password.match(/\./g) || []).length;
+    return count <= 1;
+  },
+
+  shouldShow: (password) => {
+    const count = (password.match(/\./g) || []).length;
+    return count > 1;
+  },
 };
-
-const isPrime = (n: number): boolean => {
-  if (n < 2) return false;
-  if (n === 2) return true;
-  if (n % 2 === 0) return false;
-
-  for (let i = 3; i * i <= n; i += 2) {
-    if (n % i === 0) return false;
-  }
-
-  return true;
-};
-
-export const noDot: Rule = {
-  id: "no_dot",
-  message: () => "Şifre nokta (.) içeremez",
-  check: (password) => !password.includes("."),
-};
-
 const HAMSTER = "🐹";
 
 /* 🐹 Hamster'ı koru */

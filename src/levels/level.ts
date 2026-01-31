@@ -1,17 +1,19 @@
 import {
+  containsAbsoluteZero,
   containsAlkaliMetal,
+  containsEiffelCity,
+  containsInfinitySymbol,
   containsPlanet,
   containsRomanNumeral,
   hamsterBetweenNumbers,
   hasNumber,
   hasSpecialChar,
   hasUppercase,
+  maxOneDot,
   maxTwoCarets,
   minLength,
   mustContainCurrentHour,
-  noDot,
   noFourCharPalindromeHidden,
-  noRepeatedChars,
   notStartWithNumber,
   noUppercaseAtEdges,
   numbersMustBeSorted,
@@ -19,13 +21,8 @@ import {
   planetStartsWithUppercase,
   productOfNumbersMax,
   protectHamster,
-  sumOfNumbersEquals,
 } from "../rules";
-import {
-  createRandomCaptchaRule,
-  createRandomShapePuzzle,
-  kacUcgenVar,
-} from "../rules/puzzle.rules";
+import { createRandomCaptchaRule, kacUcgenVar } from "../rules/puzzle.rules";
 import { Level } from "./level.types";
 const level: Level = {
   id: 1,
@@ -38,19 +35,19 @@ const level: Level = {
 
     hasNumber,
     hasUppercase,
-    noUppercaseAtEdges,
+    hasSpecialChar,
+
     createRandomCaptchaRule(),
 
+    containsInfinitySymbol,
+    containsAbsoluteZero,
+    protectHamster,
+    containsEiffelCity,
+    hamsterBetweenNumbers,
+    kacUcgenVar,
     numbersMustBeSorted,
 
     productOfNumbersMax(9999),
-
-    hasSpecialChar,
-    noDot,
-
-    protectHamster,
-    hamsterBetweenNumbers,
-
     mustContainCurrentHour,
 
     containsPlanet,
@@ -58,17 +55,15 @@ const level: Level = {
     containsAlkaliMetal,
 
     containsRomanNumeral,
-
-    createRandomShapePuzzle(),
-    kacUcgenVar,
-
-    noRepeatedChars,
   ],
   conditionalRules: [
     notStartWithNumber,
+    noUppercaseAtEdges,
+
     maxTwoCarets,
     noFourCharPalindromeHidden,
     onlyOneHamster,
+    maxOneDot,
   ],
 };
 

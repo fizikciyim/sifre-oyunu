@@ -22,37 +22,6 @@ const CAPTCHAS = [
   },
 ];
 
-const SHAPES = [
-  {
-    key: "kare",
-    image: require("../assets/puzzles/kare.png"),
-  },
-  {
-    key: "üçgen",
-    image: require("../assets/puzzles/ucgen.png"),
-  },
-  {
-    key: "daire",
-    image: require("../assets/puzzles/daire.png"),
-  },
-  {
-    key: "dikdörtgen",
-    image: require("../assets/puzzles/dikdortgen.png"),
-  },
-];
-
-export function createRandomShapePuzzle(): Rule {
-  const random = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-
-  return {
-    id: `puzzle_shape_${random.key}`,
-    message: () => "Resimdeki şekil parolada olmalı.",
-    image: random.image,
-    expectedAnswer: random.key,
-    check: (password) => password.toLowerCase().includes(random.key),
-  };
-}
-
 export const kacUcgenVar: Rule = {
   id: "kacUcgenVar",
   message: () => "Şifre aşağıda kaç tane üçgen olduğunu içermeli",
